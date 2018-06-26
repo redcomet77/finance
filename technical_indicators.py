@@ -115,33 +115,39 @@ class technical_indicators(object):
         return df
 
 
-    def stochastic_oscillator_k(self, df):
+    def stochastic_oscillator_k(self, df, period):
         """Calculate stochastic oscillator %K for given data.
         
         :param df: pandas.DataFrame
         :return: pandas.DataFrame
         """
-        h14 = pd.Series(df['High'].rolling(window=14).max(), name='high14')
+        hStr = 'high'+str(period)
+        lStr = 'low'+str(period)
+
+        h14 = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
         df = df.join(h14)
-        l14 = pd.Series(df['Low'].rolling(window=14).min(), name='low14')
+        l14 = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
         df = df.join(l14)
-        SOk = pd.Series((df['Close'] - df['low14']) / (df['high14'] - df['low14']), name='SO%k')
+        SOk = pd.Series((df['Close'] - df[lStr]) / (df[hStr] - df[lStr]), name='SO%k')
         df = df.join(SOk)
         return df
 
 
-    def stochastic_oscillator_d(self, df, n):
+    def stochastic_oscillator_d(self, df, n, period):
         """Calculate stochastic oscillator %D for given data.
         :param df: pandas.DataFrame
         :param n: 
         :return: pandas.DataFrame
         """
-        h14 = pd.Series(df['High'].rolling(window=14).max(), name='high14')
+        hStr = 'high'+str(period)
+        lStr = 'low'+str(period)
+
+        h14 = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
         df = df.join(h14)
-        l14 = pd.Series(df['Low'].rolling(window=14).min(), name='low14')
+        l14 = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
         df = df.join(l14)
-        SOk = pd.Series((df['Close'] - df['low14']) / (df['high14'] - df['low14']), name='SO%k')
-        SOd = pd.Series(SOk.ewm(span=14, min_periods=n).mean(), name='SO%d_' + str(n))
+        SOk = pd.Series((df['Close'] - df[lStr]) / (df[hStr] - df[lStr]), name='SO%k')
+        SOd = pd.Series(SOk.ewm(span=period, min_periods=n).mean(), name='SO%d_' + str(period))
         df = df.join(SOd)
         return df
 
