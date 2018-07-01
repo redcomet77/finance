@@ -16,34 +16,42 @@ def run():
     e_month = 6
     e_day = 30
     sym = symbols()
-    sym_list = ('gbtc', 'TSLA', 'AMD', 'SQ', 'DOCU', 'IQ', 'NVDA', 'MU', \
-                'NFLX', 'INTC', 'CRM', 'WDAY', 'TWTR', 'roku', 'cmg')
+    sym_list = ('GBTC', 'TSLA', 'AMD', 'SQ', 'DOCU', 'IQ', 'NVDA', 'MU', \
+               'NFLX', 'INTC', 'CRM', 'WDAY', 'TWTR', 'ROKU', 'CMG')
     start = datetime.datetime(s_year, s_month, s_day)
     end = datetime.datetime(e_year, e_month, e_day)
 
     TI = ti.technical_indicators()
     num_days = 3
-    period = 14
-    # fig, axes = plt.subplots(nrows=len(sym_list))
-
+    period14 = 14
+    period10 = 10
     data = {}
     data_stoch_k = {}
     data_stoch_k_ma = {}
     data_stoch_d = {}
-    for s in sym_list:
-        plt.figure(sym_list.index(s))
-        data[s] = sym.getSymbolData(s, start, end)
-        data_stoch_k[s] = TI.stochastic_oscillator_k(data[s], period)
-        data_stoch_d[s] = TI.stochastic_oscillator_d(data[s], num_days, period)
-        data_stoch_k_ma[s] = TI.moving_average(data_stoch_k[s], 'SO%k', num_days)
+    data_smi = {}
 
-        # axes[sym_list.index(s)].set_xlabel(data_stoch_k_ma[s].index.get_level_values(1))
-        data_stoch_k_ma[s]['MA_'+str(num_days)].plot(label=s+' stoch_k',  title=s)
-        data_stoch_d[s]['SO%d_'+str(period)].plot(label=s+' stoch_d', use_index=True, figsize=(10, 4))
-        sym.calcSignals(data_stoch_d[s], data_stoch_k_ma[s], period)
-    
-        # plt.legend()
-        # plt.show()
+    for s in sym_list:
+        f = plt.figure(sym_list.index(s))
+
+        data[s] = sym.getSymbolData(s, start, end)
+        data_stoch_k[s] = TI.stochastic_oscillator_k(data[s], period14)
+        data_stoch_d[s] = TI.stochastic_oscillator_d(data[s], num_days, period14)
+        data_stoch_k_ma[s] = TI.moving_average(data_stoch_k[s], 'SO%k', num_days)
+        data_smi[s] = TI.stoch_momemtum_idx(data[s], num_days, period10)
+
+        sym.calcSignals(data_stoch_d[s], data_stoch_k_ma[s], period14)
+
+        f.add_subplot(211)
+        data_stoch_k_ma[s]['MA_'+str(num_days)].plot(title=s, label=s+' stoch_k')
+        data_stoch_d[s]['SO%d_'+str(period14)].plot(label=s+' stoch_d', figsize=(10, 4))
+        plt.legend()
+        f.add_subplot(212)
+        data_smi[s]['som2'].plot(label=s+' k', figsize=(10, 4))
+        data_smi[s]['dsmi_2'].plot(label=s+' dsmi', figsize=(10, 4))
+        plt.legend()
+
+    plt.show()
 
 
 if __name__ == '__main__':
