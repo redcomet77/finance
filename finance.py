@@ -53,11 +53,10 @@ def run():
         data_smi[s]['som2'].plot(label=s+' k', figsize=(10, 4))
         data_smi[s]['dsmi_2'].plot(label=s+' dsmi', figsize=(10, 4))
         f.autofmt_xdate()
-
         # plt.xlabel(data_stoch_d[s].index.get_level_values(0)[1])
         plt.legend()
 
-    plt.show()
+    # plt.show()
 
 
 if __name__ == '__main__':

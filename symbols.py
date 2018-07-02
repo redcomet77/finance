@@ -35,16 +35,19 @@ class symbols(object):
                 days_since_last_flip = 0
                 last_toggle = toggle
 
+        RED = '\033[91m'
+        GREEN = '\033[92m'
+        YELLOW = '\033[93m'
         if (self.signal[-1] < 0 and abs(df_sok[sokStr][-1]) < 0.50) and (self.sim[-1] < 0):
-            self.printSig('sell', days_since_last_flip)
+            self.printSig(RED+'sell', days_since_last_flip)
         elif (self.signal[-1] > 0 and abs(df_sok[sokStr][-1]) > 0.50) and (self.sim[-1] > 0):
-            self.printSig('buy', days_since_last_flip)
+            self.printSig('buy'+GREEN, days_since_last_flip)
         else:
-            self.printSig('hold', days_since_last_flip)
+            self.printSig(YELLOW+'hold', days_since_last_flip)
 
     def printSig(self, s, d):
         t = 'buy' if s == 'sell' else s
-        print("{0} {1} {2}: days since last {3}: {4} {5}".format(self.signal.index.get_level_values(0)[0], \
+        print("{0} {1} {2} \033[0m : days since last {3}: \033[0m {4} {5}".format(self.signal.index.get_level_values(0)[0], \
                                                                 self.signal.index.get_level_values(1)[-1], \
                                                                 s, \
                                                                 t, \
