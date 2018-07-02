@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+pandas-technical-indicators-master/README.md
+.vscode/launch.json
+pandas-technical-indicators-master/.gitignore
+pandas-technical-indicators-master/LICENSE

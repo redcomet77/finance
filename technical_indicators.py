@@ -91,16 +91,16 @@ class technical_indicators(object):
 
         h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
         l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
+        mid = df['Close'].max() - (h.max() + l.min()) / 2
 
-        smid = pd.Series( (df['Close'] - (h + l) / 2), name='SOM') 
+        smid = pd.Series( (df['Close'] - (h + l) /2 ) / mid *100 , name='som')
         smid_smooth = pd.Series(smid.ewm(span=3, min_periods=3).mean(), name='som_'+str(period))
-        smid_smooth_2 = pd.Series(smid_smooth.ewm(span=3, min_periods=3).mean()*100, name='som2')
+        smid_smooth_2 = pd.Series((smid_smooth.ewm(span=3, min_periods=3).mean()), name='som2')
         df = df.join(smid_smooth_2)
 
         dsmi_1 = pd.Series(smid_smooth_2.ewm(span=3, min_periods=3).mean(), name='dsmi_1')
-        dsmi_2 = pd.Series(dsmi_1.ewm(span=3, min_periods=3).mean()/2, name='dsmi_2')
+        dsmi_2 = pd.Series(dsmi_1.ewm(span=3, min_periods=3).mean(), name='dsmi_2')
         df = df.join(dsmi_2)
-
         return df
 
 
