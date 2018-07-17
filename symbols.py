@@ -21,7 +21,21 @@ class symbols(object):
         start = startDate
         end = endDate
         self.symStr = sym
+        # failed = []
+        # self.retry_count = 0
+
+        # try:
         symData = web.DataReader(self.symStr, 'morningstar', start, end)
+        # except Exception as e:
+        #     print(e)
+            # if sym not in failed:
+            #     if self.retry_count == 0:
+            #         print("skipping symbol %s: number of retries "
+            #              "exceeded." % sym)
+            #         pass
+            #     else:
+            #         print("adding %s to retry list" % sym)
+            #         failed.append(sym)
         return symData
 
     def save_sp500_tickers(self):
@@ -60,17 +74,19 @@ class symbols(object):
 
         if (self.signal[-1] < 0 and self.smi[-1] < 0):
             sigStr = RED+'sell'
-            self.printSig(sigStr, days_since_last_flip)
+            self.printSig(sigStr, days_since_last_flip, df_sod)
         elif (self.signal[-1] > 0 and self.smi[-1] > 0):
             sigStr = GREEN+'buy'
-            self.printSig(sigStr, days_since_last_flip)
+            self.printSig(sigStr, days_since_last_flip, df_sod)
         else:
-            self.printSig(sigStr, days_since_last_flip)
+            self.printSig(YELLOW+'hold', days_since_last_flip, df_sod)
 
-    def printSig(self, s, d):
+    def printSig(self, s, d, df):
         t = GREEN+'buy' if s == RED+'sell' else RED+'sell'
-        print("{0} {1} {2} \033[0m : days since last {3}: \033[0m {4} \n {5} {6}".format(self.signal.index.get_level_values(0)[0], \
-                                                                self.signal.index.get_level_values(1)[-1], \
+        print("{0} {1} {2} {3} {4} \033[0m : days since last {5}: \033[0m {6}".format(df['Close'][-1], \
+                                                                self.signal.index.get_level_values(0)[0], \
+                                                                self.signal.index.get_level_values(1)[-1].date(), \
+                                                                self.signal.index.get_level_values(1)[0].date(), \
                                                                 s, \
                                                                 t, \
-                                                                d, self.smi[-1], self.signal[-1]))
+                                                                d))
