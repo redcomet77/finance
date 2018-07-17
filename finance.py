@@ -20,13 +20,14 @@ class test_instance(object):
         with open(self.args.f, newline='') as csvfile:
             cr = csv.reader(csvfile)
             l = [i[0] for i in cr]            
+            l.sort()
         return l
 
     def run(self):
         sym = symbols()
         sym_list = self.open_list()
         end = date.today()
-        start = datetime.datetime(end.year, end.month-6, end.day)
+        start = datetime.datetime(end.year, abs(13-(end.month+5)), abs(32-(end.day+30))
         TI = ti.technical_indicators()
         num_days = 3
         period14 = 14
@@ -38,7 +39,13 @@ class test_instance(object):
         data_smi = {}
 
         sap500 = sym.save_sp500_tickers()
-        eval_list = sap500
+
+        x = True
+        if x:
+            eval_list = sym_list
+        else:
+            eval_list = sap500
+
         show_g = False
 
         for s in eval_list:            
