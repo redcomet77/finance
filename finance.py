@@ -27,7 +27,7 @@ class test_instance(object):
         sym = symbols()
         sym_list = self.open_list()
         end = date.today()
-        start = datetime.datetime(end.year, abs(13-(end.month+5)), abs(32-(end.day+30))
+        start = datetime.datetime(end.year, abs(13-(end.month+5)), abs(32-(end.day+30)))
         TI = ti.technical_indicators()
         num_days = 3
         period14 = 14
