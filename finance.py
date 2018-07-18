@@ -26,8 +26,15 @@ class test_instance(object):
     def run(self):
         sym = symbols()
         sym_list = self.open_list()
+
         end = date.today()
-        start = datetime.datetime(end.year, abs(13-(end.month+5)), abs(32-(end.day+30)))
+        
+        if end.month <= 6:
+            m = 12 - (6-end.month)
+        else:
+            m = end.month - 6
+
+        start = datetime.datetime(end.year, m, end.day)
         TI = ti.technical_indicators()
         num_days = 3
         period14 = 14
