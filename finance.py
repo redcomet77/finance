@@ -26,7 +26,6 @@ class test_instance(object):
     def run(self):
         sym = symbols()
         sym_list = self.open_list()
-
         end = date.today()
         
         if end.month <= 6:

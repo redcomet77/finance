@@ -72,10 +72,10 @@ class symbols(object):
                 days_since_last_flip = 0
                 last_toggle = toggle
 
-        if (self.signal[-1] < 0 and self.smi[-1] < 0):
+        if (self.signal[-1] < 0 and self.smi[-1] < 0 and df_smi[-1] < 40 and df_sok[sokStr][-1] < 80):
             sigStr = RED+'sell'
             self.printSig(sigStr, days_since_last_flip, df_sod)
-        elif (self.signal[-1] > 0 and self.smi[-1] > 0):
+        elif (self.signal[-1] > 0 and self.smi[-1] > 0 and df_smi[-1] > -40 and df_sok[sokStr][-1] > 20):
             sigStr = GREEN+'buy'
             self.printSig(sigStr, days_since_last_flip, df_sod)
         else:
@@ -83,10 +83,10 @@ class symbols(object):
 
     def printSig(self, s, d, df):
         t = GREEN+'buy' if s == RED+'sell' else RED+'sell'
-        print("{0} {1} {2} {3} {4} \033[0m : days since last {5}: \033[0m {6}".format(df['Close'][-1], \
+        print("{0} {1} {2}\033[0m : days since last {3}: \033[0m {4} -- {5} / {6}".format(df['Close'][-1], \
                                                                 self.signal.index.get_level_values(0)[0], \
-                                                                self.signal.index.get_level_values(1)[-1].date(), \
-                                                                self.signal.index.get_level_values(1)[0].date(), \
                                                                 s, \
                                                                 t, \
-                                                                d))
+                                                                d, \
+                                                                self.signal.index.get_level_values(1)[-1].date(), \
+                                                                self.signal.index.get_level_values(1)[0].date())) 
