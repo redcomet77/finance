@@ -72,7 +72,7 @@ class symbols(object):
                 days_since_last_flip = 0
                 last_toggle = toggle
 
-        if (self.signal[-1] < 0 and self.smi[-1] < 0 and df_smi[-1] < 40 and df_sok[sokStr][-1] < 80):
+        if (self.signal[-1] < 0 and self.smi[-1] < 0 and df_smi[-1] < 40 and df_sok[sokStr][-1] > 80):
             sigStr = RED+'sell'
             self.printSig(sigStr, days_since_last_flip, df_sod)
         elif (self.signal[-1] > 0 and self.smi[-1] > 0 and df_smi[-1] > -40 and df_sok[sokStr][-1] > 20):
