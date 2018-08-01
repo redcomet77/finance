@@ -33,8 +33,10 @@ class test_instance(object):
         else:
             m = end.month - 6
 
-        start = datetime.datetime(end.year, m, end.day)
-        TI = ti.technical_indicators()
+        start = datetime.date(end.year, m, end.day)
+
+        print (start, end)
+        TI = ti.technical_indicators('robinhood')
         num_days = 3
         period14 = 14
         period10 = 10
@@ -55,12 +57,12 @@ class test_instance(object):
         show_g = False
 
         for s in eval_list:            
-            data[s] = sym.getSymbolData(s, start, end)
+            data[s] = sym.getSymbolData(s, start, end, TI.source)
             data_stoch_k[s] = TI.stochastic_oscillator_k(data[s], period14)
             data_stoch_d[s] = TI.stochastic_oscillator_d(data[s], num_days, period14)
             data_stoch_k_ma[s] = TI.moving_average(data_stoch_k[s], 'SO%k', num_days)
             data_smi[s] = TI.stoch_momemtum_idx(data[s], num_days, period10)
-            sym.calcSignals(data_stoch_d[s], data_stoch_k_ma[s], data_smi[s]['smi'], data_smi[s]['smi_sig'], period14)
+            sym.calcSignals(data_stoch_d[s], data_stoch_k_ma[s], data_smi[s]['smi'], data_smi[s]['smi_sig'], period14, TI)
             
             if show_g: 
                 f = plt.figure(eval_list.index(s))

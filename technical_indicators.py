@@ -9,6 +9,9 @@ import numpy as np
 log = logging.getLogger(__name__)
 
 class technical_indicators(object):
+    def __init__(self, source):
+        self.source = source
+
     def moving_average(self, df, col, n):
         """Calculate the moving average for the given data.
         
@@ -35,7 +38,6 @@ class technical_indicators(object):
 
     def bollinger_bands(self, df, n):
         """
-        
         :param df: pandas.DataFrame
         :param n: 
         :return: pandas.DataFrame
@@ -59,10 +61,15 @@ class technical_indicators(object):
         """
         hStr = 'high'+str(period)
         lStr = 'low'+str(period)
+        if self.source == 'morningstar':
+            h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
+            l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
+            SOk = pd.Series((df['Close'] - l) / (h - l)*100, name='SO%k')
+        elif self.source == 'robinhood':
+            h = pd.Series(df['high_price'].rolling(window=period).max(), name=hStr)
+            l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
+            SOk = pd.Series((float(df['close_price'][0]) - l) / (h - l)*100, name='SO%k')
 
-        h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
-        l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
-        SOk = pd.Series((df['Close'] - l) / (h - l)*100, name='SO%k')
         df = df.join(SOk)
         return df
 
@@ -76,10 +83,16 @@ class technical_indicators(object):
         hStr = 'high'+str(period)
         lStr = 'low'+str(period)
 
-        h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
-        l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
-        SOk = pd.Series((df['Close'] - l) / (h - l)*100, name='SO%k')
-        SOd = pd.Series(SOk.ewm(span=3, min_periods=3).mean(), name='SO%d_' + str(period))
+        if self.source == 'morningstar':
+            h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
+            l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
+            SOk = pd.Series((df['Close'] - l) / (h - l)*100, name='SO%k')
+            SOd = pd.Series(SOk.ewm(span=3, min_periods=3).mean(), name='SO%d_' + str(period))
+        elif self.source == 'robinhood':
+            h = pd.Series(df['high_price'].rolling(window=period).max(), name=hStr)
+            l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
+            SOk = pd.Series((float(df['close_price'][0]) - l) / (h - l)*100, name='SO%k')
+            SOd = pd.Series(SOk.ewm(span=3, min_periods=3).mean(), name='SO%d_' + str(period))
         df = df.join(SOd)
         return df
 
@@ -89,10 +102,15 @@ class technical_indicators(object):
         hStr = 'high'+str(period)
         lStr = 'low'+str(period)
 
-        h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
-        l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
+        if self.source == 'morningstar':
+            h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
+            l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
+            smid = pd.Series( (df['Close'] - (h + l) /2 ), name='som')
+        elif self.source == 'robinhood':
+            h = pd.Series(df['high_price'].rolling(window=period).max(), name=hStr)
+            l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
+            smid = pd.Series( (float(df['close_price'][0]) - (h + l) /2 ), name='som')
 
-        smid = pd.Series( (df['Close'] - (h + l) /2 ), name='som')
         smid_smooth = pd.Series(smid.ewm(span=3, min_periods=3).mean(), name='som_'+str(period))
         smid_smooth_2 = pd.Series(smid_smooth.ewm(span=3, min_periods=3).mean(), name='som2')
 

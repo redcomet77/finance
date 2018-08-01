@@ -17,25 +17,13 @@ class symbols(object):
         self.signal = None
         self.smi = None
 
-    def getSymbolData(self, sym, startDate, endDate):
+    def getSymbolData(self, sym, startDate, endDate, source = 'morningstar'):
         start = startDate
         end = endDate
         self.symStr = sym
-        # failed = []
-        # self.retry_count = 0
+ 
+        symData = web.DataReader(self.symStr, source, start, end)
 
-        # try:
-        symData = web.DataReader(self.symStr, 'morningstar', start, end)
-        # except Exception as e:
-        #     print(e)
-            # if sym not in failed:
-            #     if self.retry_count == 0:
-            #         print("skipping symbol %s: number of retries "
-            #              "exceeded." % sym)
-            #         pass
-            #     else:
-            #         print("adding %s to retry list" % sym)
-            #         failed.append(sym)
         return symData
 
     def save_sp500_tickers(self):
@@ -52,7 +40,7 @@ class symbols(object):
 
         return tickers
 
-    def calcSignals(self, df_sod, df_sok, df_smi, df_sig, period):
+    def calcSignals(self, df_sod, df_sok, df_smi, df_sig, period, ti):
         sodStr = 'SO%d_'+str(period)
         sokStr = 'SO%k'
 
@@ -74,16 +62,31 @@ class symbols(object):
 
         if (self.signal[-1] < 0 and self.smi[-1] < 0 and df_smi[-1] < 40 and df_sok[sokStr][-1] > 80):
             sigStr = RED+'sell'
-            self.printSig(sigStr, days_since_last_flip, df_sod)
+            self.printSig(sigStr, days_since_last_flip, df_sod, ti)
         elif (self.signal[-1] > 0 and self.smi[-1] > 0 and df_smi[-1] > -40 and df_sok[sokStr][-1] > 20):
             sigStr = GREEN+'buy'
-            self.printSig(sigStr, days_since_last_flip, df_sod)
+            self.printSig(sigStr, days_since_last_flip, df_sod, ti)
         else:
-            self.printSig(YELLOW+'hold', days_since_last_flip, df_sod)
+            self.printSig(YELLOW+'hold', days_since_last_flip, df_sod, ti)
 
-    def printSig(self, s, d, df):
-        t = GREEN+'buy' if s == RED+'sell' else RED+'sell'
-        print("{0} {1} {2}\033[0m : days since last {3}: \033[0m {4} -- {5} / {6}".format(df['Close'][-1], \
+    def printSig(self, s, d, df, ti):
+        if s == RED+'sell':
+            t = GREEN+'buy'
+        elif s == GREEN+'buy':
+            t = RED+'sell'
+        else:
+            t =  YELLOW+'hold'
+        
+        if ti.source == 'morningstar':
+            print("{0} {1} {2}\033[0m : days since last {3}: \033[0m {4} -- {5} / {6}".format(df['Close'][-1], \
+                                                                self.signal.index.get_level_values(0)[0], \
+                                                                s, \
+                                                                t, \
+                                                                d, \
+                                                                self.signal.index.get_level_values(1)[-1].date(), \
+                                                                self.signal.index.get_level_values(1)[0].date())) 
+        elif ti.source == 'robinhood':
+            print("{0} {1} {2}\033[0m : days since last {3}: \033[0m {4} -- {5} / {6}".format(df['close_price'][-1], \
                                                                 self.signal.index.get_level_values(0)[0], \
                                                                 s, \
                                                                 t, \
