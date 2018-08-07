@@ -36,7 +36,8 @@ class test_instance(object):
         start = datetime.date(end.year, m, end.day)
 
         print (start, end)
-        TI = ti.technical_indicators('robinhood')
+        s = 'robinhood'
+        TI = ti.technical_indicators(s)
         num_days = 3
         period14 = 14
         period10 = 10
@@ -54,31 +55,33 @@ class test_instance(object):
         else:
             eval_list = sap500
 
-        show_g = False
-
+        # show_g = False
+        show_g = True
         for s in eval_list:            
             data[s] = sym.getSymbolData(s, start, end, TI.source)
             data_stoch_k[s] = TI.stochastic_oscillator_k(data[s], period14)
             data_stoch_d[s] = TI.stochastic_oscillator_d(data[s], num_days, period14)
             data_stoch_k_ma[s] = TI.moving_average(data_stoch_k[s], 'SO%k', num_days)
             data_smi[s] = TI.stoch_momemtum_idx(data[s], num_days, period10)
-            sym.calcSignals(data_stoch_d[s], data_stoch_k_ma[s], data_smi[s]['smi'], data_smi[s]['smi_sig'], period14, TI)
+            sym.calcSignals(data_stoch_d[s], data_stoch_k[s], data_smi[s]['smi'], data_smi[s]['smi_sig'], period14, TI)
             
-            if show_g: 
-                f = plt.figure(eval_list.index(s))
-                f.canvas.set_window_title(s)
-                f.add_subplot(211)
-                data_stoch_k_ma[s]['MA_'+str(num_days)].plot(title=s, label=s+' stoch_k')
-                data_stoch_d[s]['SO%d_'+str(period14)].plot(label=s+' stoch_d', figsize=(10, 4))
-                plt.legend()
-                f.add_subplot(212)
-                data_smi[s]['smi'].plot(label=s+' smi', figsize=(10, 4))
-                data_smi[s]['smi_sig'].plot(label=s+' smi_sig', figsize=(10, 4))
-                f.autofmt_xdate()
-                plt.xlabel(data_stoch_d[s].index.get_level_values(0)[1])
-                plt.legend()
+            # if show_g: 
+        self.show_graph('JD', data_stoch_k_ma, num_days, data_stoch_d, period14, data_smi, show_g)
 
-        if show_g:
+    def show_graph(self, s, data_stoch_k_ma, num_days, data_stoch_d, period14, data_smi, show):
+        f = plt.figure(s)
+        f.canvas.set_window_title(s)
+        f.add_subplot(211)
+        data_stoch_k_ma[s]['MA_'+str(num_days)].plot(title=s, label=s+' stoch_k')
+        data_stoch_d[s]['SO%d_'+str(period14)].plot(label=s+' stoch_d', figsize=(10, 4))
+        plt.legend()
+        f.add_subplot(212)
+        data_smi[s]['smi'].plot(label=s+' smi', figsize=(10, 4))
+        data_smi[s]['smi_sig'].plot(label=s+' smi_sig', figsize=(10, 4))
+        f.autofmt_xdate()
+        plt.xlabel(data_stoch_d[s].index.get_level_values(0)[1])
+        plt.legend()
+        if show:
             plt.show()
 
 if __name__ == '__main__':

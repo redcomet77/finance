@@ -23,6 +23,8 @@ class symbols(object):
         self.symStr = sym
  
         symData = web.DataReader(self.symStr, source, start, end)
+        if source == 'robinhood':
+            symData = symData[int(len(symData)/2):]
 
         return symData
 
@@ -60,22 +62,23 @@ class symbols(object):
                 days_since_last_flip = 0
                 last_toggle = toggle
 
+        # print(df_sod[sodStr][-1], df_sok[sokStr][-1], df_smi[-1], df_sig[-1])
         if (self.signal[-1] < 0 and self.smi[-1] < 0 and df_smi[-1] < 40 and df_sok[sokStr][-1] > 80):
             sigStr = RED+'sell'
-            self.printSig(sigStr, days_since_last_flip, df_sod, ti)
+            self.printSig(sigStr, days_since_last_flip, df_sod, ti, sigStr)
         elif (self.signal[-1] > 0 and self.smi[-1] > 0 and df_smi[-1] > -40 and df_sok[sokStr][-1] > 20):
             sigStr = GREEN+'buy'
-            self.printSig(sigStr, days_since_last_flip, df_sod, ti)
+            self.printSig(sigStr, days_since_last_flip, df_sod, ti, sigStr)
         else:
-            self.printSig(YELLOW+'hold', days_since_last_flip, df_sod, ti)
+            self.printSig(YELLOW+'hold', days_since_last_flip, df_sod, ti, sigStr)
 
-    def printSig(self, s, d, df, ti):
+    def printSig(self, s, d, df, ti, current_sig):
         if s == RED+'sell':
             t = GREEN+'buy'
         elif s == GREEN+'buy':
             t = RED+'sell'
         else:
-            t =  YELLOW+'hold'
+            t =  current_sig
         
         if ti.source == 'morningstar':
             print("{0} {1} {2}\033[0m : days since last {3}: \033[0m {4} -- {5} / {6}".format(df['Close'][-1], \
@@ -87,7 +90,7 @@ class symbols(object):
                                                                 self.signal.index.get_level_values(1)[0].date())) 
         elif ti.source == 'robinhood':
             print("{0} {1} {2}\033[0m : days since last {3}: \033[0m {4} -- {5} / {6}".format(df['close_price'][-1], \
-                                                                self.signal.index.get_level_values(0)[0], \
+                                                                self.signal.index.get_level_values(0)[len(self.signal)-1], \
                                                                 s, \
                                                                 t, \
                                                                 d, \

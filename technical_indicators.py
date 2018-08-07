@@ -64,11 +64,11 @@ class technical_indicators(object):
         if self.source == 'morningstar':
             h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
             l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
-            SOk = pd.Series((df['Close'] - l) / (h - l)*100, name='SO%k')
+            SOk = pd.Series((df['Close'] - l) / (h - l) / h.max()*100, name='SO%k')
         elif self.source == 'robinhood':
             h = pd.Series(df['high_price'].rolling(window=period).max(), name=hStr)
             l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
-            SOk = pd.Series((float(df['close_price'][0]) - l) / (h - l)*100, name='SO%k')
+            SOk = pd.Series((float(df['close_price'][0]) - l) / (h - l) / h.max()*100, name='SO%k')
 
         df = df.join(SOk)
         return df
@@ -86,12 +86,12 @@ class technical_indicators(object):
         if self.source == 'morningstar':
             h = pd.Series(df['High'].rolling(window=period).max(), name=hStr)
             l = pd.Series(df['Low'].rolling(window=period).min(), name=lStr)
-            SOk = pd.Series((df['Close'] - l) / (h - l)*100, name='SO%k')
+            SOk = pd.Series((df['Close'] - l) / (h - l) / h.max()*100, name='SO%k')
             SOd = pd.Series(SOk.ewm(span=3, min_periods=3).mean(), name='SO%d_' + str(period))
         elif self.source == 'robinhood':
             h = pd.Series(df['high_price'].rolling(window=period).max(), name=hStr)
             l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
-            SOk = pd.Series((float(df['close_price'][0]) - l) / (h - l)*100, name='SO%k')
+            SOk = pd.Series((float(df['close_price'][0]) - l) / (h - l) / h.max()*100, name='SO%k')
             SOd = pd.Series(SOk.ewm(span=3, min_periods=3).mean(), name='SO%d_' + str(period))
         df = df.join(SOd)
         return df
@@ -109,16 +109,18 @@ class technical_indicators(object):
         elif self.source == 'robinhood':
             h = pd.Series(df['high_price'].rolling(window=period).max(), name=hStr)
             l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
-            smid = pd.Series( (float(df['close_price'][0]) - (h + l) /2 ), name='som')
+            smid = pd.Series( (float(df['close_price'][0]) - (h + l) /2), name='som')
 
-        smid_smooth = pd.Series(smid.ewm(span=3, min_periods=3).mean(), name='som_'+str(period))
+        smid_ = pd.Series(smid.ewm(span=period, min_periods=period).mean(), name='som_'+str(period))
+        smid_smooth = pd.Series(smid_.ewm(span=3, min_periods=3).mean(), name='som1')
         smid_smooth_2 = pd.Series(smid_smooth.ewm(span=3, min_periods=3).mean(), name='som2')
 
         dsmi = pd.Series(h-l, name='dsmi')
         dsmi_1 = pd.Series(dsmi.ewm(span=3, min_periods=3).mean(), name='dsmi_1')
         dsmi_2 = pd.Series(dsmi_1.ewm(span=3, min_periods=3).mean(), name='dsmi_2')
+        df = df.join(dsmi_2)
 
-        smi = pd.Series((smid_smooth_2 / (dsmi_2/2))*100, name='smi')
+        smi = pd.Series( (smid_smooth_2 / (dsmi_2/2)) / h.max() *100, name='smi')
         df = df.join(smi)
         smi_sig = pd.Series(smi.ewm(span=10, min_periods=10).mean(), name='smi_sig')
         df = df.join(smi_sig)
