@@ -55,8 +55,8 @@ class test_instance(object):
         else:
             eval_list = sap500
 
-        # show_g = False
-        show_g = True
+        show_g = False
+        # show_g = True
         for s in eval_list:            
             data[s] = sym.getSymbolData(s, start, end, TI.source)
             data_stoch_k[s] = TI.stochastic_oscillator_k(data[s], period14)
