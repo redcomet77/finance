@@ -111,8 +111,8 @@ class technical_indicators(object):
         df = df.join(dsmi_2)
 
         smi = pd.Series( (smid_smooth_2 / (dsmi_2/2)) / h.max() *100, name='smi')
-        df = df.join(smid_smooth_2)
-        smi_sig = pd.Series(smi.ewm(span=3, min_periods=3).mean(), name='smi_sig')
+        df = df.join(smi)
+        smi_sig = pd.Series(smi.ewm(span=period, min_periods=period).mean(), name='smi_sig')
         df = df.join(smi_sig)
         return df
 

@@ -60,7 +60,7 @@ class test_instance(object):
         else:
             eval_list = y
 
-        eval_list = sym_list + y
+        eval_list = sym_list #+ y
         
         # show_g = False
         show_g = True
@@ -70,7 +70,7 @@ class test_instance(object):
             data_stoch_d[s] = TI.stochastic_oscillator_d(data[s], num_days, period14)
             data_stoch_k_ma[s] = TI.moving_average(data_stoch_k[s], 'SO%k', num_days)
             data_smi[s] = TI.stoch_momemtum_idx(data[s], num_days, period10)
-            sym.calcSignals(data_stoch_d[s], data_stoch_k[s], data_smi[s]['som2'], data_smi[s]['smi_sig'], period14, TI)
+            sym.calcSignals(data_stoch_d[s], data_stoch_k[s], data_smi[s]['smi'], data_smi[s]['smi_sig'], period14, TI)
             
         if show_g: 
             self.show_graph('ROKU', data_stoch_k_ma, num_days, data_stoch_d, period14, data_smi, show_g)
