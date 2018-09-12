@@ -17,7 +17,7 @@ class symbols(object):
         self.signal = None
         self.smi = None
 
-    def getSymbolData(self, sym, startDate, endDate, source = 'morningstar'):
+    def getSymbolData(self, sym, startDate, endDate, source):
         start = startDate
         end = endDate
         self.symStr = sym
@@ -63,10 +63,10 @@ class symbols(object):
                 last_toggle = toggle
 
         # print(df_sod[sodStr][-1], df_sok[sokStr][-1], df_smi[-1], df_sig[-1])
-        if (self.signal[-1] < 0 and self.smi[-1] < 0 and df_smi[-1] < 40 and df_sok[sokStr][-1] < 80):
+        if (self.signal[-1] < 0 and self.smi[-1] < 0):  # and df_smi[-1] < 40 and df_sok[sokStr][-1] < 80):
             sigStr = RED+'sell'
             self.printSig(sigStr, days_since_last_flip, df_sod, ti, sigStr)
-        elif (self.signal[-1] > 0 and self.smi[-1] > 0 and df_smi[-1] > -40 and df_sok[sokStr][-1] > 20):
+        elif (self.signal[-1] > 0 and self.smi[-1] > 0): # and df_smi[-1] > -40 and df_sok[sokStr][-1] > 20):
             sigStr = GREEN+'buy'
             self.printSig(sigStr, days_since_last_flip, df_sod, ti, sigStr)
         else:

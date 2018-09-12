@@ -27,17 +27,21 @@ class test_instance(object):
         sym = symbols()
         sym_list = self.open_list()
         end = date.today()
-        
+        d = end.day
         if end.month <= 6:
             m = 12 - (6-end.month)
         else:
             m = end.month - 6
 
-        start = datetime.date(end.year, m, end.day)
+        if m == 2:
+            if d >= 28:
+                d = 28
+  
+        start = datetime.date(end.year, m, d)
 
         print (start, end)
-        s = 'robinhood'
-        TI = ti.technical_indicators(s)
+        data_source = 'robinhood'
+        TI = ti.technical_indicators(data_source)
         num_days = 3
         period14 = 14
         period10 = 10
@@ -48,25 +52,28 @@ class test_instance(object):
         data_smi = {}
 
         sap500 = sym.save_sp500_tickers()
-
+        y = sap500
+        y.sort()
         x = True
         if x:
             eval_list = sym_list
         else:
-            eval_list = sap500
+            eval_list = y
 
-        show_g = False
-        # show_g = True
+        eval_list = sym_list + y
+        
+        # show_g = False
+        show_g = True
         for s in eval_list:            
-            data[s] = sym.getSymbolData(s, start, end, TI.source)
+            data[s] = sym.getSymbolData(s, start, end, data_source)
             data_stoch_k[s] = TI.stochastic_oscillator_k(data[s], period14)
             data_stoch_d[s] = TI.stochastic_oscillator_d(data[s], num_days, period14)
             data_stoch_k_ma[s] = TI.moving_average(data_stoch_k[s], 'SO%k', num_days)
             data_smi[s] = TI.stoch_momemtum_idx(data[s], num_days, period10)
-            sym.calcSignals(data_stoch_d[s], data_stoch_k[s], data_smi[s]['smi'], data_smi[s]['smi_sig'], period14, TI)
+            sym.calcSignals(data_stoch_d[s], data_stoch_k[s], data_smi[s]['som2'], data_smi[s]['smi_sig'], period14, TI)
             
-            # if show_g: 
-        self.show_graph('JD', data_stoch_k_ma, num_days, data_stoch_d, period14, data_smi, show_g)
+        if show_g: 
+            self.show_graph('ROKU', data_stoch_k_ma, num_days, data_stoch_d, period14, data_smi, show_g)
 
     def show_graph(self, s, data_stoch_k_ma, num_days, data_stoch_d, period14, data_smi, show):
         f = plt.figure(s)
@@ -85,5 +92,6 @@ class test_instance(object):
             plt.show()
 
 if __name__ == '__main__':
+    print('start')
     test = test_instance()
     test.run()
