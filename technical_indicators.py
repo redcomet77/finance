@@ -75,8 +75,8 @@ class technical_indicators(object):
         """Calculate stochastic oscillator %D for given data.
         :param df: pandas.DataFrame
         :param n: 
-        :return: pandas.DataFrame
-        """
+        :return: pandas.DataFrame        """
+
         hStr = 'high'+str(period)
         lStr = 'low'+str(period)
 
@@ -84,8 +84,8 @@ class technical_indicators(object):
         l = pd.Series(df['low_price'].rolling(window=period).min(), name=lStr)
         c = pd.Series(df['close_price'], dtype=float, name = 'close')
 
-        SOk = pd.Series((c - l) / (h - l) / h.max()*100, name='SO%k')
-        SOd = pd.Series(SOk.ewm(span=period, min_periods=period).mean(), name='SO%d_' + str(period))
+        SOk = pd.Series((c - l) / (h - l) , name='SO%k')
+        SOd = pd.Series(SOk.ewm(span=4, min_periods=4).mean()/ h.max()*100, name='SO%d_' + str(period))
         df = df.join(SOd)
         return df
 
@@ -110,7 +110,7 @@ class technical_indicators(object):
         dsmi_2 = pd.Series(dsmi_1.ewm(span=3, min_periods=3).mean(), name='dsmi_2')
         df = df.join(dsmi_2)
 
-        smi = pd.Series( (smid_smooth_2 / (dsmi_2/2)) / h.max() *100, name='smi')
+        smi = pd.Series( (smid_smooth_2 / (dsmi_2/2)) / h.max() *10000, name='smi')
         df = df.join(smi)
         smi_sig = pd.Series(smi.ewm(span=period, min_periods=period).mean(), name='smi_sig')
         df = df.join(smi_sig)
